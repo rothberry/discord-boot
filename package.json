@@ -4,7 +4,7 @@
 	"description": "discord bot testing",
 	"main": "index.js",
 	"scripts": {
-		"test": "test",
+		"test": "ECHO 'test'",
 		"start": "nodemon index.js",
 		"debug": "nodemon inspect index.js"
 	},
