@@ -1,36 +1,58 @@
-const fs = require("node:fs")
-const path = require("node:path")
+const fs = require("fs")
+// const path = require("path")
 const { Client, Collection, Intents } = require("discord.js")
-// const Discord = require("discord.js")
 const { token } = require("./config.json")
-
-const prefix = "!"
 
 const client = new Client({
 	intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES],
 })
 
+const prefix = "!"
+
+// ! in deploy commands?
+client.commands = new Collection()
+
+const commandFiles = fs
+	.readdirSync("./commands/")
+	.filter((file) => file.endsWith(".js"))
+
+for (const file of commandFiles) {
+	const command = require(`./commands/${file}`)
+	if (command.data) {
+		client.commands.set(command.data.name, command)
+	} else {
+		client.commands.set(command.name, command)
+	}
+}
+
 client.once("ready", () => {
 	console.log("Ready for " + client.user.username + "!")
+	console.log(client.commands)
 })
 
+// ! using module.exports
 client.on("messageCreate", (message) => {
-	console.log("messageCreate")
 	if (!message.content.startsWith(prefix) || message.author.bot) return
+	console.log("messageCreate Dynamic")
 
 	const args = message.content.slice(prefix.length).split(/ +/)
-	// const command = args.shift().toLowerCase()
 
-	console.log(`the message is: ${message}`)
+	// console.log(`the message is: ${message} in ${message.channel.name}`)
 	console.log({ args })
 
-	args.forEach((arg) => {
+	args.forEach(async (arg) => {
 		switch (arg.toLowerCase()) {
 			case "ping":
-				message.channel.send("PONG")
+				client.commands.get("ping").execute(message, arg)
 				break
 			case "pong":
-				message.channel.send("PING")
+				client.commands.get("pong").execute(message, arg)
+				break
+			case "beep":
+				client.commands.get("beep").execute(message, arg)
+				break
+			case "shroom":
+				client.commands.get("shroom").execute(message, arg)
 			default:
 				break
 		}
