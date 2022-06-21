@@ -55,6 +55,19 @@ client.on("messageCreate", (message) => {
 				break
 			case "shroom":
 				client.commands.get("shroom").execute(message, arg)
+			case "help":
+				let helpList = [
+					"List of Current Commands:\n",
+					"!help\t=>\tShows this list\n",
+				]
+				// message.channel.send("List of Current Commands:")
+				// message.channel.send("!help\t=>\tShows this list")
+				// console.log(client.commands)
+				for (const cmd of client.commands) {
+					console.log({ cmd })
+					helpList.push(`!${cmd[0]}\t=>\t${cmd[1].description}\n`)
+				}
+				message.channel.send(helpList.join(" "))
 			default:
 				break
 		}
