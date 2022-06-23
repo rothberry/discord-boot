@@ -7,12 +7,18 @@ const {
 	createAudioPlayer,
 	createAudioResource,
 } = require("@discordjs/voice")
-
 require("dotenv").config()
+const ytdl = require("ytdl-core")
+const ytSearch = require("yt-search")
+
 const { token } = process.env
 
 const client = new Client({
-	intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES],
+	intents: [
+		Intents.FLAGS.GUILDS,
+		Intents.FLAGS.GUILD_MESSAGES,
+		Intents.FLAGS.GUILD_VOICE_STATES,
+	],
 })
 
 const prefix = "!"
@@ -65,16 +71,23 @@ client.on("messageCreate", (message) => {
 		case "play":
 			// Summon bot into current voice channel
 			// play music
-
-			const connection = joinVoiceChannel({
-				channelId: message.member.voice.channel.id,
-				guildId: message.guild.id,
-				adapterCreator: message.guild.voiceAdapterCreator,
-			})
-			const audioPlayer = createAudioPlayer()
-			const resource = createAudioResource("./assets/I_Wan'na_Be_Like_You.mp3")
-			audioPlayer.play(resource)
-			connection.subscribe(audioPlayer)
+			try {
+				console.log(message.member.voice)
+				const connection = joinVoiceChannel({
+					channelId: message.member.voice.channel.id,
+					guildId: message.guild.id,
+					adapterCreator: message.guild.voiceAdapterCreator,
+				})
+				const audioPlayer = createAudioPlayer()
+				const resource = createAudioResource(
+					"./assets/I_Wan'na_Be_Like_You.mp3"
+				)
+				audioPlayer.play(resource)
+				connection.subscribe(audioPlayer)
+			} catch (error) {
+				console.log("error: ", error, "done")
+				message.reply("Get in a voice channel ya dingus")
+			}
 
 			break
 		case "stop":
@@ -82,6 +95,9 @@ client.on("messageCreate", (message) => {
 			// connection.destroy()
 			break
 
+		case "play1":
+			client.commands.get("play").execute(message, args)
+			break
 		case "help":
 			let helpList = [
 				"List of Current Commands:\n",
