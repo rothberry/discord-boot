@@ -1,7 +1,13 @@
 const fs = require("fs")
 // const path = require("path")
-const { Client, Collection, Intents } = require("discord.js")
-// const { token } = require("./config.json")
+const { Client, Collection, Intents, GuildMember } = require("discord.js")
+const {
+	joinVoiceChannel,
+	getVoiceConnection,
+	createAudioPlayer,
+	createAudioResource,
+} = require("@discordjs/voice")
+
 require("dotenv").config()
 const { token } = process.env
 
@@ -29,8 +35,9 @@ for (const file of commandFiles) {
 
 client.once("ready", () => {
 	console.log("Ready for " + client.user.username + "!")
-	console.log(client.commands)
 })
+
+const member = new GuildMember(client)
 
 // ! using module.exports
 client.on("messageCreate", (message) => {
@@ -42,36 +49,53 @@ client.on("messageCreate", (message) => {
 	// console.log(`the message is: ${message} in ${message.channel.name}`)
 	console.log({ args })
 
-	args.forEach(async (arg) => {
-		switch (arg.toLowerCase()) {
-			case "ping":
-				client.commands.get("ping").execute(message, arg)
-				break
-			case "pong":
-				client.commands.get("pong").execute(message, arg)
-				break
-			case "beep":
-				client.commands.get("beep").execute(message, arg)
-				break
-			case "shroom":
-				client.commands.get("shroom").execute(message, arg)
-			case "help":
-				let helpList = [
-					"List of Current Commands:\n",
-					"!help\t=>\tShows this list\n",
-				]
-				// message.channel.send("List of Current Commands:")
-				// message.channel.send("!help\t=>\tShows this list")
-				// console.log(client.commands)
-				for (const cmd of client.commands) {
-					console.log({ cmd })
-					helpList.push(`!${cmd[0]}\t=>\t${cmd[1].description}\n`)
-				}
-				message.channel.send(helpList.join(" "))
-			default:
-				break
-		}
-	})
+	switch (args[0].toLowerCase()) {
+		case "ping":
+			client.commands.get("ping").execute(message, arg)
+			break
+		case "pong":
+			client.commands.get("pong").execute(message, arg)
+			break
+		case "beep":
+			client.commands.get("beep").execute(message, arg)
+			break
+		case "shroom":
+			client.commands.get("shroom").execute(message, arg)
+			break
+		case "play":
+			// Summon bot into current voice channel
+			// play music
+
+			const connection = joinVoiceChannel({
+				channelId: message.member.voice.channel.id,
+				guildId: message.guild.id,
+				adapterCreator: message.guild.voiceAdapterCreator,
+			})
+			const audioPlayer = createAudioPlayer()
+			const resource = createAudioResource("./assets/I_Wan'na_Be_Like_You.mp3")
+			audioPlayer.play(resource)
+			connection.subscribe(audioPlayer)
+
+			break
+		case "stop":
+			// const connection = getVoiceConnection(myVoiceChannel.guild.id)
+			// connection.destroy()
+			break
+
+		case "help":
+			let helpList = [
+				"List of Current Commands:\n",
+				"!help\t=>\tShows this list\n",
+			]
+			for (const cmd of client.commands) {
+				console.log({ cmd })
+				helpList.push(`!${cmd[0]}\t=>\t${cmd[1].description}\n`)
+			}
+			message.channel.send(helpList.join(" "))
+			break
+		default:
+			break
+	}
 })
 
 client.login(token)
