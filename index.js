@@ -1,16 +1,9 @@
 const fs = require("fs")
 // const path = require("path")
 const { Client, Collection, Intents, GuildMember } = require("discord.js")
-const {
-	joinVoiceChannel,
-	getVoiceConnection,
-	createAudioPlayer,
-	createAudioResource,
-} = require("@discordjs/voice")
-require("dotenv").config()
-const ytdl = require("ytdl-core")
-const ytSearch = require("yt-search")
+const { Player } = require("discord-player")
 
+require("dotenv").config()
 const { token } = process.env
 
 const client = new Client({
@@ -44,6 +37,12 @@ client.once("ready", () => {
 })
 
 const member = new GuildMember(client)
+client.player = new Player(client, {
+	ytdlOptions: {
+		quality: "highestaudio",
+		highWaterMark: 1 << 25,
+	},
+})
 
 // ! using module.exports
 client.on("messageCreate", (message) => {
@@ -69,34 +68,12 @@ client.on("messageCreate", (message) => {
 			client.commands.get("shroom").execute(message, arg)
 			break
 		case "play":
-			// Summon bot into current voice channel
-			// play music
-			try {
-				console.log(message.member.voice)
-				const connection = joinVoiceChannel({
-					channelId: message.member.voice.channel.id,
-					guildId: message.guild.id,
-					adapterCreator: message.guild.voiceAdapterCreator,
-				})
-				const audioPlayer = createAudioPlayer()
-				const resource = createAudioResource(
-					"./assets/I_Wan'na_Be_Like_You.mp3"
-				)
-				audioPlayer.play(resource)
-				connection.subscribe(audioPlayer)
-			} catch (error) {
-				console.log("error: ", error, "done")
-				message.reply("Get in a voice channel ya dingus")
+			if (args.length > 1) {
+				client.commands.get("play").execute(client, message, args.slice(1))
 			}
-
 			break
 		case "stop":
-			// const connection = getVoiceConnection(myVoiceChannel.guild.id)
-			// connection.destroy()
-			break
-
-		case "play1":
-			client.commands.get("play").execute(message, args)
+			client.commands.get("stop").execute(client, message)
 			break
 		case "help":
 			let helpList = [
