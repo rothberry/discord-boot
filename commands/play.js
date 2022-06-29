@@ -9,6 +9,7 @@ module.exports = {
 		if (!voiceChannel) return message.reply("Not in a channel")
 
 		const myGuild = message.member.voice.channel.guild
+		// TODO Check if it's creating a queue for each !play cmd
 		const queue = await client.player.createQueue(myGuild)
 		if (!queue.connection) await queue.connect(voiceChannel)
 

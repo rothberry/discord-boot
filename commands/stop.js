@@ -1,5 +1,3 @@
-const { getVoiceConnection } = require("@discordjs/voice")
-
 module.exports = {
 	name: "stop",
 	description: "Stop Bungus",

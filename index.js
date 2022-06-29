@@ -37,6 +37,7 @@ client.once("ready", () => {
 })
 
 const member = new GuildMember(client)
+// TODO Refactor out client. to just player
 client.player = new Player(client, {
 	ytdlOptions: {
 		quality: "highestaudio",
@@ -47,8 +48,6 @@ client.player = new Player(client, {
 // ! using module.exports
 client.on("messageCreate", (message) => {
 	if (!message.content.startsWith(prefix) || message.author.bot) return
-	console.log("messageCreate Dynamic")
-
 	const args = message.content.slice(prefix.length).split(/ +/)
 
 	// console.log(`the message is: ${message} in ${message.channel.name}`)
@@ -75,7 +74,22 @@ client.on("messageCreate", (message) => {
 		case "stop":
 			client.commands.get("stop").execute(client, message)
 			break
+		// ! Media controls
+		/* 
+				info or now playing
+				skip
+				pause (and resume?)
+				show queue
+				shuffle?
+				skip (with x amount of tracks)
+				seek (x amount of seconds)
+			 */
+		case "info":
+			// TODO Send queue instead of client or player?
+			client.commands.get("info").execute(client, message)
+			break
 		case "help":
+			// TODO Add prettier help
 			let helpList = [
 				"List of Current Commands:\n",
 				"!help\t=>\tShows this list\n",
@@ -90,5 +104,7 @@ client.on("messageCreate", (message) => {
 			break
 	}
 })
+
+// TODO add event on player track start to send to channel?
 
 client.login(token)
