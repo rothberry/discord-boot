@@ -28,9 +28,9 @@ module.exports = {
 			} = result
 			await queue.addTracks(tracks)
 			embed
-				.setDescription(`**[${title}](${url})** has been added to the Queue`)
+				.setDescription(`**[${title}](${url})** playlist has been added to the Queue`)
 				.setThumbnail(thumbnail)
-				.setFooter({ text: `Added ${tracks.length}` })
+				.setFooter({ text: `Added ${tracks.length} tracks` })
 		} else {
 			const track = result.tracks[0]
 			const { title, url, thumbnail, duration } = track

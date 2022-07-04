@@ -88,6 +88,20 @@ client.on("messageCreate", (message) => {
 			// TODO Send queue instead of client or player?
 			client.commands.get("info").execute(client, message)
 			break
+		case "skip":
+			if (args.length > 1 || typeof args[1] === "number") {
+				client.commands.get("skip").execute(client, message, args[1])
+			} else {
+				client.commands.get("skip").execute(client, message)
+			}
+			break
+		case "queue":
+			if (args.length > 1 || typeof args[1] === "number") {
+				client.commands.get("queue").execute(client, message, args[1])
+			} else {
+				client.commands.get("queue").execute(client, message)
+			}
+			break
 		case "help":
 			// TODO Add prettier help
 			let helpList = [
