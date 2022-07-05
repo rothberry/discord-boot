@@ -1,6 +1,12 @@
 const fs = require("fs")
 // const path = require("path")
-const { Client, Collection, Intents, GuildMember } = require("discord.js")
+const {
+	Client,
+	Collection,
+	Intents,
+	GuildMember,
+	MessageEmbed,
+} = require("discord.js")
 const { Player } = require("discord-player")
 
 require("dotenv").config()
@@ -25,11 +31,7 @@ const commandFiles = fs
 
 for (const file of commandFiles) {
 	const command = require(`./commands/${file}`)
-	if (command.data) {
-		client.commands.set(command.data.name, command)
-	} else {
-		client.commands.set(command.name, command)
-	}
+	client.commands.set(command.name, command)
 }
 
 client.once("ready", () => {
@@ -48,9 +50,8 @@ client.player = new Player(client, {
 // ! using module.exports
 client.on("messageCreate", (message) => {
 	if (!message.content.startsWith(prefix) || message.author.bot) return
-	const args = message.content.slice(prefix.length).split(/ +/)
 
-	// console.log(`the message is: ${message} in ${message.channel.name}`)
+	const args = message.content.slice(prefix.length).split(/ +/)
 	console.log({ args })
 
 	switch (args[0].toLowerCase()) {
@@ -69,6 +70,8 @@ client.on("messageCreate", (message) => {
 		case "play":
 			if (args.length > 1) {
 				client.commands.get("play").execute(client, message, args.slice(1))
+			} else {
+				message.reply("!play needs a search query or url...")
 			}
 			break
 		case "stop":
@@ -76,30 +79,42 @@ client.on("messageCreate", (message) => {
 			break
 		// ! Media controls
 		/* 
-				info or now playing
-				skip
 				pause (and resume?)
-				show queue
 				shuffle?
-				skip (with x amount of tracks)
 				seek (x amount of seconds)
 			 */
+		case "pause":
+			client.commands.get("pause").execute(client, message)
+			break
+		case "resume":
+			client.commands.get("resume").execute(client, message)
+			break
+		case "seek":
+			// takes an (Optional) arg of seconds to skip
+			if (typeof parseInt(args[1]) === "number") {
+				client.commands.get("seek").execute(client, message, parseInt(args[1]))
+			}
+			break
 		case "info":
 			// TODO Send queue instead of client or player?
 			client.commands.get("info").execute(client, message)
 			break
 		case "skip":
-			if (args.length > 1 || typeof args[1] === "number") {
-				client.commands.get("skip").execute(client, message, args[1])
-			} else {
-				client.commands.get("skip").execute(client, message)
-			}
+			client.commands
+				.get("skip")
+				.execute(client, message, parseInt(args[1]) || 1)
 			break
 		case "queue":
-			if (args.length > 1 || typeof args[1] === "number") {
-				client.commands.get("queue").execute(client, message, args[1])
-			} else {
-				client.commands.get("queue").execute(client, message)
+			client.commands
+				.get("queue")
+				.execute(client, message, parseInt(args[1]) || null)
+			break
+		case "volume":
+			// takes in an arg to set the volume level
+			if (typeof parseInt(args[1]) === "number") {
+				client.commands
+					.get("volume")
+					.execute(client, message, parseInt(args[1]))
 			}
 			break
 		case "help":
@@ -118,7 +133,5 @@ client.on("messageCreate", (message) => {
 			break
 	}
 })
-
-// TODO add event on player track start to send to channel?
 
 client.login(token)
