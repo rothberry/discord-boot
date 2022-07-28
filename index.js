@@ -10,7 +10,9 @@ const {
 const { Player } = require("discord-player")
 
 require("dotenv").config()
-const { token } = process.env
+const { token, PORT } = process.env
+
+const port = PORT || 8080
 
 const client = new Client({
 	intents: [
