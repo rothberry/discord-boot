@@ -34,6 +34,7 @@ module.exports = {
 		} else {
 			const track = result.tracks[0]
 			const { title, url, thumbnail, duration } = track
+			console.log(track)
 			await queue.addTrack(track)
 			embed
 				.setDescription(`**[${title}](${url})** has been added to the Queue`)

@@ -137,3 +137,11 @@ client.on("messageCreate", (message) => {
 })
 
 client.login(token)
+
+// client.on("apiResponse", (res) => {
+// 	console.log({ res })
+// })
+
+client.on("error", (err) => {
+	console.error({ err })
+})
