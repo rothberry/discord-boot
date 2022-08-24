@@ -2,7 +2,7 @@ const { MessageEmbed } = require("discord.js")
 
 module.exports = {
 	name: "queue",
-	description: "Shows the queue",
+	description: "Shows the queue. !queue <amount of tracks> will show that many tracks in the queue",
 	execute: async (client, message, amount = null) => {
 		// todo find connection
 		const myGuild = message.member.voice.channel.guild

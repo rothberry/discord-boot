@@ -11,8 +11,8 @@ module.exports = {
 
 		const song = queue.nowPlaying()
 		const { title, url, thumbnail, duration } = song
-		console.log(song)
-		console.log(queue)
+		// console.log(song)
+		// console.log(queue)
 
 		// TODO make prgoressbar fit all widths
 		let bar = queue.createProgressBar({

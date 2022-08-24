@@ -3,7 +3,7 @@ const { QueryType } = require("discord-player")
 
 module.exports = {
 	name: "play",
-	description: "play music",
+	description: "Can search youtube for first result, or can take a URL",
 	execute: async (client, message, args) => {
 		const voiceChannel = message.member.voice.channel
 		if (!voiceChannel) return message.reply("Not in a channel")
@@ -20,6 +20,8 @@ module.exports = {
 			requestedBy: message.member.user,
 			searchEngine: QueryType.AUTO,
 		})
+
+		// debugger
 		if (!!result.playlist) {
 			// if it's Playlist, then add all to queue
 			const {
@@ -34,6 +36,7 @@ module.exports = {
 		} else {
 			const track = result.tracks[0]
 			const { title, url, thumbnail, duration } = track
+			// console.log(track)
 			await queue.addTrack(track)
 			embed
 				.setDescription(`**[${title}](${url})** has been added to the Queue`)
