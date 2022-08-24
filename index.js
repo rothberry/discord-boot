@@ -125,9 +125,6 @@ client.on("messageCreate", (message) => {
 		case "summon":
 			client.commands.get("summon").execute(client, message)
 			break
-		case "disconnect":
-			client.commands.get("disconnect").execute(client, message)
-			break
 		case "help":
 			// TODO Add prettier help
 			let helpList = [
