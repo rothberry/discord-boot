@@ -47,6 +47,15 @@ client.player = new Player(client, {
 		quality: "highestaudio",
 		highWaterMark: 1 << 25,
 	},
+	connectionTimeout: 5000
+})
+
+// client.player.addListener("connectionCreate", () => {
+// 	console.log("CREATING CONNECTION")
+// })
+
+client.player.addListener("botDisconnect", (e) => {
+	console.log("\nDISCONNNECTINGGGGG\n")
 })
 
 // ! using module.exports
@@ -79,12 +88,6 @@ client.on("messageCreate", (message) => {
 		case "stop":
 			client.commands.get("stop").execute(client, message)
 			break
-		// ! Media controls
-		/* 
-				pause (and resume?)
-				shuffle?
-				seek (x amount of seconds)
-			 */
 		case "pause":
 			client.commands.get("pause").execute(client, message)
 			break
@@ -118,6 +121,12 @@ client.on("messageCreate", (message) => {
 					.get("volume")
 					.execute(client, message, parseInt(args[1]))
 			}
+			break
+		case "summon":
+			client.commands.get("summon").execute(client, message)
+			break
+		case "disconnect":
+			client.commands.get("disconnect").execute(client, message)
 			break
 		case "help":
 			// TODO Add prettier help
