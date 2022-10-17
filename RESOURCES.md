@@ -8,3 +8,8 @@
 - https://discord-player.js.org/
 
 ## Deployed on Heroku
+
+### Heroku commands
+
+- heroku scale worker=<number>
+- heroku maintainence:(on/off)
