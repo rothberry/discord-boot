@@ -1,4 +1,4 @@
-const { MessageEmbed } = require("discord.js")
+const { EmbedBuilder } = require("discord.js")
 
 module.exports = {
 	name: "info",
@@ -20,7 +20,7 @@ module.exports = {
 			timecodes: true,
 			length: 10,
 		})
-		let embed = new MessageEmbed()
+		let embed = new EmbedBuilder()
 			.setThumbnail(thumbnail)
 			.setDescription(`Currently Player: [${title}](${url})\n\n` + bar)
 

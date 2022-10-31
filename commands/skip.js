@@ -1,4 +1,4 @@
-const { MessageEmbed } = require("discord.js")
+const { EmbedBuilder } = require("discord.js")
 
 module.exports = {
 	name: "skip",
@@ -14,7 +14,7 @@ module.exports = {
 		const skippedTo = await queue.tracks[0]
 
 		// debugger
-		let embed = new MessageEmbed()
+		let embed = new EmbedBuilder()
 			.setTitle(`Now Playing: ${skippedTo.title}`)
 			.setThumbnail(skippedTo.thumbnail)
 			.setDescription(`Skipped: ${skippedTrack.title}`)

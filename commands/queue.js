@@ -1,4 +1,4 @@
-const { MessageEmbed } = require("discord.js")
+const { EmbedBuilder } = require("discord.js")
 
 module.exports = {
 	name: "queue",
@@ -21,7 +21,7 @@ module.exports = {
 		if (!amount) {
 			amount = mappedTracks.length
 		}
-		let embed = new MessageEmbed()
+		let embed = new EmbedBuilder()
 			.setTitle(np.title)
 			.setURL(np.url)
 			.setThumbnail(np.thumbnail)

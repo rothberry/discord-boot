@@ -1,10 +1,11 @@
-const { MessageEmbed } = require("discord.js")
+const { EmbedBuilder } = require("discord.js")
 const { QueryType } = require("discord-player")
 
 module.exports = {
 	name: "play",
 	description: "Can search youtube for first result, or can take a URL",
 	execute: async (client, message, args) => {
+		console.log("PLAYING")
 		const voiceChannel = message.member.voice.channel
 		if (!voiceChannel) return message.reply("Not in a channel")
 
@@ -13,7 +14,7 @@ module.exports = {
 		const queue = await client.player.createQueue(myGuild)
 		if (!queue.connection) await queue.connect(voiceChannel)
 
-		let embed = new MessageEmbed()
+		let embed = new EmbedBuilder()
 
 		// ! Can handle single song search or url
 		const result = await client.player.search(args.join(" "), {
@@ -30,7 +31,9 @@ module.exports = {
 			} = result
 			await queue.addTracks(tracks)
 			embed
-				.setDescription(`**[${title}](${url})** playlist has been added to the Queue`)
+				.setDescription(
+					`**[${title}](${url})** playlist has been added to the Queue`
+				)
 				.setThumbnail(thumbnail)
 				.setFooter({ text: `Added ${tracks.length} tracks` })
 		} else {

@@ -1,7 +1,7 @@
 module.exports = {
     name: "ping",
     description: "this is a ping command",
-    async execute(message, arg) {
+    async execute(message) {
         message.channel.send("PONG")
     }
 	// async execute(interaction) {

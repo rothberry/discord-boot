@@ -1,7 +1,7 @@
 module.exports = {
 	name: "seek",
 	description: "seeks ahead (WIP)",
-	execute: async (client, message, amount) => {
+	execute: async (client, message, amount = 30) => {
 		const myGuild = message.member.voice.channel.guild
 		const queue = client.player.getQueue(myGuild)
 		if (!queue) return await message.reply("THERE ARE NO ONGS!")

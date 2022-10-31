@@ -16,6 +16,7 @@ const port = PORT || 8080
 
 const client = new Client({
 	intents: [
+		GatewayIntentBits.MessageContent,
 		GatewayIntentBits.Guilds,
 		GatewayIntentBits.GuildMessages,
 		GatewayIntentBits.GuildVoiceStates,
@@ -50,9 +51,9 @@ client.player = new Player(client, {
 	// connectionTimeout: 5000
 })
 
-// client.player.addListener("connectionCreate", () => {
-// 	console.log("CREATING CONNECTION")
-// })
+client.player.addListener("connectionCreate", () => {
+	console.log("CREATING CONNECTION")
+})
 
 client.player.addListener("botDisconnect", (e) => {
 	console.log("\nDISCONNNECTINGGGGG\n")
@@ -67,10 +68,10 @@ client.on("messageCreate", (message) => {
 
 	switch (args[0].toLowerCase()) {
 		case "ping":
-			client.commands.get("ping").execute(message, arg)
+			client.commands.get("ping").execute(message)
 			break
 		case "pong":
-			client.commands.get("pong").execute(message, arg)
+			client.commands.get("pong").execute(message)
 			break
 		case "beep":
 			client.commands.get("beep").execute(message, arg)
