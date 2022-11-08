@@ -22,9 +22,7 @@ module.exports = {
 			.setThumbnail(thumbnail)
 			.setDescription(`Currently Player: [${title}](${url})\n\n` + bar)
 
-		await interaction.reply({
-			embeds: [embed],
-		})
+		await interaction.channel.send({ embeds: [embed] })
 	},
 }
 

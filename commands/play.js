@@ -17,15 +17,14 @@ module.exports = {
 		if (!voiceChannel) return interaction.reply("Not in a channel")
 		const queue = await client.player.createQueue(guild)
 		if (!queue.connection) await queue.connect(voiceChannel)
-		// * Unneed because of clientside error handling
-		// if (!searchTerm) return interaction.reply("YOU MUST HAVE A SEARCH TERM")
-
-		let embed = new EmbedBuilder()
 
 		const result = await client.player.search(searchTerm, {
 			requestedBy: interaction.user,
 			searchEngine: QueryType.AUTO,
 		})
+
+		console.log({ searchTerm, result })
+		let embed = new EmbedBuilder()
 
 		if (!!result.playlist) {
 			// if it's Playlist, then add all to queue
@@ -38,7 +37,8 @@ module.exports = {
 				.setDescription(
 					`**[${title}](${url})** playlist has been added to the Queue`
 				)
-				.setThumbnail(thumbnail)
+				// TODO Why no work on playlist only??
+				// .setThumbnail(thumbnail)
 				.setFooter({ text: `Added ${tracks.length} tracks` })
 		} else {
 			const track = result.tracks[0]
@@ -51,6 +51,6 @@ module.exports = {
 		}
 
 		if (!queue.playing) await queue.play()
-		await interaction.channel.send({ embeds: [embed] })
+		interaction.channel.send({ embeds: [embed] })
 	},
 }
