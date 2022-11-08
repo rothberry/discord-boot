@@ -6,7 +6,8 @@
 	"scripts": {
 		"test": "ECHO 'test'",
 		"start": "node index.js",
-		"debug": "nodemon --inspect index.js"
+		"debug": "nodemon --inspect index.js",
+		"commands": "node deployCommands.js"
 	},
 	"author": "rothberry",
 	"license": "MIT",

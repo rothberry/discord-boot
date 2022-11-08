@@ -1,9 +1,12 @@
+const { SlashCommandBuilder } = require("discord.js")
+
 module.exports = {
-	name: "shroom",
-	description: "send a shroom",
-	async execute(message) {
-		const img_url =
+	data: new SlashCommandBuilder()
+		.setName("shroom")
+		.setDescription("How dare you.."),
+	async execute(interaction) {
+		await interaction.reply(
 			"https://tenor.com/view/soomin-mushroom-wriggle-wiggle-soominshroom-gif-20187102"
-		return message.channel.send(img_url)
+		)
 	},
 }

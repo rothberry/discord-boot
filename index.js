@@ -1,18 +1,17 @@
 const fs = require("fs")
-// const path = require("path")
+const path = require("path")
 const {
 	Client,
 	Collection,
 	GatewayIntentBits,
 	GuildMember,
-	MessageEmbed,
+	Events,
+	REST,
+	Routes,
 } = require("discord.js")
 const { Player } = require("discord-player")
 
-require("dotenv").config()
-const { token, PORT } = process.env
-
-const port = PORT || 8080
+const { token } = require("./config.json")
 
 const client = new Client({
 	intents: [
@@ -28,13 +27,22 @@ const prefix = "!"
 // ! in deploy commands?
 client.commands = new Collection()
 
+const commandsPath = path.join(__dirname, "commands")
 const commandFiles = fs
-	.readdirSync("./commands/")
+	.readdirSync(commandsPath)
 	.filter((file) => file.endsWith(".js"))
 
 for (const file of commandFiles) {
-	const command = require(`./commands/${file}`)
-	client.commands.set(command.name, command)
+	const filePath = path.join(commandsPath, file)
+	const command = require(filePath)
+	// Set a new item in the Collection with the key as the command name and the value as the exported module
+	if ("data" in command && "execute" in command) {
+		client.commands.set(command.data.name, command)
+	} else {
+		console.log(
+			`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`
+		)
+	}
 }
 
 client.once("ready", () => {
@@ -48,7 +56,6 @@ client.player = new Player(client, {
 		quality: "highestaudio",
 		highWaterMark: 1 << 25,
 	},
-	// connectionTimeout: 5000
 })
 
 client.player.addListener("connectionCreate", () => {
@@ -59,87 +66,21 @@ client.player.addListener("botDisconnect", (e) => {
 	console.log("\nDISCONNNECTINGGGGG\n")
 })
 
-// ! using module.exports
-client.on("messageCreate", (message) => {
-	if (!message.content.startsWith(prefix) || message.author.bot) return
+client.on(Events.InteractionCreate, async (interaction) => {
+	if (!interaction.isChatInputCommand()) return
 
-	const args = message.content.slice(prefix.length).split(/ +/)
-	console.log({ args })
+	const command = interaction.client.commands.get(interaction.commandName)
 
-	switch (args[0].toLowerCase()) {
-		case "ping":
-			client.commands.get("ping").execute(message)
-			break
-		case "pong":
-			client.commands.get("pong").execute(message)
-			break
-		case "beep":
-			client.commands.get("beep").execute(message, arg)
-			break
-		case "shroom":
-			client.commands.get("shroom").execute(message, arg)
-			break
-		case "play":
-			if (args.length > 1) {
-				client.commands.get("play").execute(client, message, args.slice(1))
-			} else {
-				message.reply("!play needs a search query or url...")
-			}
-			break
-		case "stop":
-			client.commands.get("stop").execute(client, message)
-			break
-		case "pause":
-			client.commands.get("pause").execute(client, message)
-			break
-		case "resume":
-			client.commands.get("resume").execute(client, message)
-			break
-		case "seek":
-			// takes an (Optional) arg of seconds to skip
-			if (typeof parseInt(args[1]) === "number") {
-				client.commands.get("seek").execute(client, message, parseInt(args[1]))
-			}
-			break
-		case "info":
-			// TODO Send queue instead of client or player?
-			client.commands.get("info").execute(client, message)
-			break
-		case "skip":
-			client.commands
-				.get("skip")
-				.execute(client, message, parseInt(args[1]) || 1)
-			break
-		case "queue":
-			client.commands
-				.get("queue")
-				.execute(client, message, parseInt(args[1]) || null)
-			break
-		case "volume":
-			// takes in an arg to set the volume level
-			if (typeof parseInt(args[1]) === "number") {
-				client.commands
-					.get("volume")
-					.execute(client, message, parseInt(args[1]))
-			}
-			break
-		case "summon":
-			client.commands.get("summon").execute(client, message)
-			break
-		case "help":
-			// TODO Add prettier help
-			let helpList = [
-				"List of Current Commands:\n",
-				"!help\t=>\tShows this list\n",
-			]
-			for (const cmd of client.commands) {
-				console.log({ cmd })
-				helpList.push(`!${cmd[0]}\t=>\t${cmd[1].description}\n`)
-			}
-			message.channel.send(helpList.join(" "))
-			break
-		default:
-			break
+	if (!command) {
+		console.error(`No command matching ${interaction.commandName} was found.`)
+		return
+	}
+
+	try {
+		await command.execute(interaction, client)
+	} catch (error) {
+		console.error(`Error executing ${interaction.commandName}`)
+		console.error(error)
 	}
 })
 
