@@ -1,7 +1,7 @@
 const { SlashCommandBuilder } = require("discord.js")
 
 module.exports = {
-	data: new SlashCommandBuilder().setName("kill").setDescription("Kill Bungus"),
+	data: new SlashCommandBuilder().setName("stop").setDescription("Stopping Bungus"),
 	async execute(interaction) {
 		const { client, guild } = interaction
 		const queue = await client.player.getQueue(guild)
