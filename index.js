@@ -6,11 +6,8 @@ const {
 	GatewayIntentBits,
 	GuildMember,
 	Events,
-	REST,
-	Routes,
 } = require("discord.js")
 const { Player } = require("discord-player")
-
 const { token } = require("./config.json")
 
 const client = new Client({
@@ -22,9 +19,6 @@ const client = new Client({
 	],
 })
 
-const prefix = "!"
-
-// ! in deploy commands?
 client.commands = new Collection()
 
 const commandsPath = path.join(__dirname, "commands")
@@ -49,8 +43,6 @@ client.once("ready", () => {
 	console.log("Ready for " + client.user.username + "!")
 })
 
-const member = new GuildMember(client)
-// TODO Refactor out client. to just player
 client.player = new Player(client, {
 	ytdlOptions: {
 		quality: "highestaudio",
@@ -77,6 +69,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
 	}
 
 	try {
+		console.log({ commandName: interaction.commandName })
 		await command.execute(interaction)
 	} catch (error) {
 		console.error(`Error executing ${interaction.commandName}`)
@@ -85,10 +78,6 @@ client.on(Events.InteractionCreate, async (interaction) => {
 })
 
 client.login(token)
-
-// client.on("apiResponse", (res) => {
-// 	console.log({ res })
-// })
 
 client.on("error", (err) => {
 	console.error({ err })
