@@ -48,6 +48,7 @@ client.player = new Player(client, {
 		quality: "highestaudio",
 		highWaterMark: 1 << 25,
 	},
+	initialVolume: 20,
 })
 
 client.player.addListener("connectionCreate", () => {
