@@ -16,6 +16,8 @@ module.exports = {
 		const queue = client.player.getQueue(guild)
 		if (!queue) return await message.reply("Nothing in the Queue!")
 
+		await interaction.deferReply()
+
 		// let amount = interaction.options.getInteger("amount") || 1
 		// for (let i = 0; i < amount; i++) {
 		// }
@@ -34,5 +36,6 @@ module.exports = {
 			.setDescription(`Backed: ${skippedTrack.title}`)
 
 		await interaction.channel.send({ embeds: [embed] })
+		await interaction.deleteReply()
 	},
 }

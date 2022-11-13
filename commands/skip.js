@@ -16,6 +16,8 @@ module.exports = {
 		const queue = client.player.getQueue(guild)
 		if (!queue) return await message.reply("Nothing in the Queue!")
 
+		await interaction.deferReply()
+
 		const skippedTrack = queue.current
 		const nextUp = queue.tracks[amount - 1]
 
@@ -38,5 +40,7 @@ module.exports = {
 			.setDescription(`Skipped: ${skippedTrack.title}`)
 
 		await interaction.channel.send({ embeds: [embed] })
+		await interaction.deleteReply()
+
 	},
 }
