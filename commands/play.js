@@ -1,5 +1,6 @@
 const { EmbedBuilder, SlashCommandBuilder } = require("discord.js")
 const { QueryType } = require("discord-player")
+const wait = require("node:timers/promises").setTimeout
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -7,7 +8,9 @@ module.exports = {
 		.addStringOption((option) =>
 			option.setName("search").setRequired(true).setDescription("searchTerms")
 		)
-		.setDescription("Can search youtube for first result, or can take a URL"),
+		.setDescription(
+			"Can search youtube for first result, or can take a URL, may work for Spotfiy too?"
+		),
 
 	execute: async (interaction) => {
 		console.log("PLAYING")
@@ -15,8 +18,20 @@ module.exports = {
 		const searchTerm = interaction.options.getString("search")
 		const voiceChannel = interaction.member.voice.channel
 		if (!voiceChannel) return interaction.reply("Not in a channel")
-		const queue = await client.player.createQueue(guild)
+
+		await interaction.deferReply()
+
+		let queue
+		const oldQueue = client.player.getQueue(guild)
+		if (!!oldQueue) {
+			console.log("oldQueue")
+			queue = oldQueue
+		} else {
+			console.log("newQueue")
+			queue = await client.player.createQueue(guild)
+		}
 		if (!queue.connection) await queue.connect(voiceChannel)
+		await queue.setVolume(50)
 
 		const result = await client.player.search(searchTerm, {
 			requestedBy: interaction.user,
@@ -37,7 +52,7 @@ module.exports = {
 				.setDescription(
 					`**[${title}](${url})** playlist has been added to the Queue`
 				)
-				// TODO Why no work on playlist only??
+				// ? Why no work on playlist only??
 				// .setThumbnail(thumbnail)
 				.setFooter({ text: `Added ${tracks.length} tracks` })
 		} else {
@@ -51,6 +66,10 @@ module.exports = {
 		}
 
 		if (!queue.playing) await queue.play()
-		interaction.channel.send({ embeds: [embed] })
+		await interaction.editReply("🔻🔻🔻 Found some shit 🔻🔻🔻")
+		await interaction.channel.send({ embeds: [embed] })
+		// ? Delete it?
+		// await wait(5000)
+		// await interaction.deleteReply()
 	},
 }

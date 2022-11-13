@@ -9,6 +9,7 @@ module.exports = {
 		const queue = client.player.getQueue(guild)
 		if (!queue) return await interaction.reply("The queue is empty..")
 
+		// TODO combine pause and resume
 		queue.setPaused(true)
 		await interaction.reply("Paused...")
 	},

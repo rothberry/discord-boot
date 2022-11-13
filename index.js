@@ -4,7 +4,6 @@ const {
 	Client,
 	Collection,
 	GatewayIntentBits,
-	GuildMember,
 	Events,
 } = require("discord.js")
 const { Player } = require("discord-player")
@@ -48,7 +47,7 @@ client.player = new Player(client, {
 		quality: "highestaudio",
 		highWaterMark: 1 << 25,
 	},
-	initialVolume: 20,
+	smoothVolume: true,
 })
 
 client.player.addListener("connectionCreate", () => {
