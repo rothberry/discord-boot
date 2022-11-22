@@ -31,8 +31,7 @@ module.exports = {
 			queue = await client.player.createQueue(guild)
 		}
 		if (!queue.connection) await queue.connect(voiceChannel)
-		await queue.setVolume(50)
-
+		if (!oldQueue) await queue.setVolume(30)
 		const result = await client.player.search(searchTerm, {
 			requestedBy: interaction.user,
 			searchEngine: QueryType.AUTO,
