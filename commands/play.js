@@ -21,51 +21,64 @@ module.exports = {
 		await interaction.deferReply()
 
 		let queue
-		const oldQueue = client.player.getQueue(guild)
+		// const oldQueue = client.player.queues.get(guild)
+		const oldQueue = client.player.queues.get(guild)
 		if (!!oldQueue) {
 			console.log("oldQueue")
 			queue = oldQueue
 		} else {
 			console.log("newQueue")
-			queue = await client.player.createQueue(guild)
+			// queue = await client.player.createQueue(guild)
+			queue = await client.player.queues.create(guild)
 		}
 		if (!queue.connection) await queue.connect(voiceChannel)
-		if (!oldQueue) await queue.setVolume(30)
+		// if (!oldQueue) await queue.setVolume(30)
+		if (!oldQueue) {
+			queue.options.volume = 30
+		}
+		// debugger
+		// TODO Search not returning tracks
 		const result = await client.player.search(searchTerm, {
 			requestedBy: interaction.user,
-			searchEngine: QueryType.AUTO,
+			searchEngine: QueryType.YOUTUBE,
 		})
 
 		console.log({ searchTerm, result })
 		let embed = new EmbedBuilder()
 
-		if (!!result.playlist) {
-			// if it's Playlist, then add all to queue
-			const {
-				tracks,
-				playlist: { title, url, thumbnail },
-			} = result
-			await queue.addTracks(tracks)
-			embed
-				.setDescription(
-					`**[${title}](${url})** playlist has been added to the Queue`
-				)
-				// ? Why no work on playlist only??
-				// .setThumbnail(thumbnail)
-				.setFooter({ text: `Added ${tracks.length} tracks` })
+		if (result.hasTracks()) {
+			if (!!result.playlist) {
+				// if it's Playlist, then add all to queue
+				const {
+					tracks,
+					playlist: { title, url, thumbnail },
+				} = result
+				await queue.addTracks(tracks)
+				embed
+					.setDescription(
+						`**[${title}](${url})** playlist has been added to the Queue`
+					)
+					// ? Why no work on playlist only??
+					// .setThumbnail(thumbnail)
+					.setFooter({ text: `Added ${tracks.length} tracks` })
+			} else {
+				const track = result.tracks[0]
+				// console.log(track)
+				debugger
+				const { title, url, thumbnail, duration } = track
+				await queue.addTrack(track)
+				embed
+					.setDescription(`**[${title}](${url})** has been added to the Queue`)
+					.setThumbnail(thumbnail)
+					.setFooter({ text: `Duration: ${duration}` })
+			}
+			if (!queue.playing) await queue.play()
+			await interaction.editReply("🔻🔻🔻 Found some shit 🔻🔻🔻")
+			await interaction.channel.send({ embeds: [embed] })
 		} else {
-			const track = result.tracks[0]
-			const { title, url, thumbnail, duration } = track
-			await queue.addTrack(track)
-			embed
-				.setDescription(`**[${title}](${url})** has been added to the Queue`)
-				.setThumbnail(thumbnail)
-				.setFooter({ text: `Duration: ${duration}` })
+			await interaction.editReply("🔺🔺🔺 We ain't found shit 🔺🔺🔺")
 		}
 
-		if (!queue.playing) await queue.play()
-		await interaction.editReply("🔻🔻🔻 Found some shit 🔻🔻🔻")
-		await interaction.channel.send({ embeds: [embed] })
 		// ? Delete it?
 		// await wait(5000)
 		// await interaction.deleteReply()

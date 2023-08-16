@@ -6,7 +6,7 @@ module.exports = {
 		.setDescription("Resumes Music"),
 	execute: async (interaction) => {
 		const { guild, client } = interaction
-		const queue = client.player.getQueue(guild)
+		const queue = client.player.queues.get(guild)
 		if (!queue) return await interaction.reply("The queue is empty..")
 
 		queue.setPaused(false)

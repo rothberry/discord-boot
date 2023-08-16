@@ -6,7 +6,7 @@ module.exports = {
 		.setDescription("Shows info on current song"),
 	execute: async (interaction) => {
 		const { client, guild } = interaction
-		const queue = client.player.getQueue(guild)
+		const queue = client.player.queues.get(guild)
 		if (!queue) return await message.reply("THERE ARE NO ONGS!")
 
 		await interaction.deferReply()

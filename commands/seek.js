@@ -15,7 +15,7 @@ module.exports = {
 	execute: async (interaction) => {
 		const { client, guild } = interaction
 		let seconds = interaction.options.getInteger("seconds") || 30
-		const queue = client.player.getQueue(guild)
+		const queue = client.player.queues.get(guild)
 		if (!queue) return await interaction.reply("Nothing in the queue!")
 		console.log("SEEKING")
 		console.log({ seconds })

@@ -13,7 +13,7 @@ module.exports = {
 	// ),
 	execute: async (interaction) => {
 		const { client, guild } = interaction
-		const queue = client.player.getQueue(guild)
+		const queue = client.player.queues.get(guild)
 		if (!queue) return await message.reply("Nothing in the Queue!")
 
 		await interaction.deferReply()
