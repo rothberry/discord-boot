@@ -6,7 +6,7 @@ const {
 	GatewayIntentBits,
 	Events,
 } = require("discord.js")
-const { Player } = require("discord-player")
+// const { Player } = require("discord-player")
 const { token } = require("./config.json")
 
 const client = new Client({

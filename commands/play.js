@@ -1,6 +1,5 @@
 const { EmbedBuilder, SlashCommandBuilder } = require("discord.js")
 const { QueryType } = require("discord-player")
-const wait = require("node:timers/promises").setTimeout
 
 module.exports = {
 	data: new SlashCommandBuilder()
