@@ -1,13 +1,13 @@
 const fs = require("fs")
 const path = require("path")
-const {
-	Client,
-	Collection,
-	GatewayIntentBits,
-	Events,
-} = require("discord.js")
+const { Client, Collection, GatewayIntentBits, Events } = require("discord.js")
 const { Player } = require("discord-player")
 const { token } = require("./config.json")
+const {
+	YouTubeExtractor,
+	SpotifyExtractor,
+	SoundCloudExtractor,
+} = require("@discord-player/extractor")
 
 const client = new Client({
 	intents: [
@@ -50,6 +50,17 @@ client.player = new Player(client, {
 	smoothVolume: true,
 })
 
+const loadExtractors = async (player) => {
+	await player.extractors.loadDefault()
+
+	await player.extractors.register(YouTubeExtractor, {})
+	await player.extractors.register(SpotifyExtractor, {})
+	await player.extractors.register(SoundCloudExtractor, {})
+	console.log({ pExtractors: player.extractors })
+}
+
+loadExtractors(client.player)
+
 client.player.addListener("connectionCreate", () => {
 	console.log("CREATING CONNECTION")
 })
@@ -82,4 +93,3 @@ client.login(token)
 client.on("error", (err) => {
 	console.error({ err })
 })
-

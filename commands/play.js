@@ -1,5 +1,9 @@
 const { EmbedBuilder, SlashCommandBuilder } = require("discord.js")
-const { QueryType } = require("discord-player")
+const { QueryType, useMainPlayer } = require("discord-player")
+const {
+	SoundCloudExtractor,
+	YouTubeExtractor,
+} = require("@discord-player/extractor")
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -36,16 +40,22 @@ module.exports = {
 		if (!oldQueue) {
 			queue.options.volume = 30
 		}
-		// debugger
+
+		await client.player.extractors.register(YouTubeExtractor)
 		// TODO Search not returning tracks
 		const result = await client.player.search(searchTerm, {
 			requestedBy: interaction.user,
-			searchEngine: QueryType.YOUTUBE,
+			// searchEngine: QueryType.SOUNDCLOUD_SEARCH,
+			// searchEngine: `ext:${YouTubeExtractor.identifier}`,
 		})
-
+		// * can use this instead of passing down and destructuring player/client/etc
+		// const pl1 = await useMainPlayer()
 		console.log({ searchTerm, result })
+		// debugger
 		let embed = new EmbedBuilder()
 
+		const track = result.tracks[0]
+		
 		if (result.hasTracks()) {
 			if (!!result.playlist) {
 				// if it's Playlist, then add all to queue
@@ -62,9 +72,7 @@ module.exports = {
 					// .setThumbnail(thumbnail)
 					.setFooter({ text: `Added ${tracks.length} tracks` })
 			} else {
-				const track = result.tracks[0]
-				// console.log(track)
-				debugger
+				console.log(track)
 				const { title, url, thumbnail, duration } = track
 				await queue.addTrack(track)
 				embed
@@ -72,7 +80,8 @@ module.exports = {
 					.setThumbnail(thumbnail)
 					.setFooter({ text: `Duration: ${duration}` })
 			}
-			if (!queue.playing) await queue.play()
+			// debugger
+			if (!queue.isPlaying()) await queue.play(track)
 			await interaction.editReply("🔻🔻🔻 Found some shit 🔻🔻🔻")
 			await interaction.channel.send({ embeds: [embed] })
 		} else {
