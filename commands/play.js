@@ -1,9 +1,5 @@
 const { EmbedBuilder, SlashCommandBuilder } = require("discord.js")
-const { QueryType, useMainPlayer } = require("discord-player")
-const {
-	SoundCloudExtractor,
-	YouTubeExtractor,
-} = require("@discord-player/extractor")
+const { starMid } = require("../debugHelpers.js")
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -16,46 +12,34 @@ module.exports = {
 		),
 
 	execute: async (interaction) => {
-		console.log("PLAYING")
-		const { client, guild } = interaction
+		starMid("PLAYING")
+		const {
+			client: { player },
+			guild,
+		} = interaction
 		const searchTerm = interaction.options.getString("search")
+
+		// TODO refactor all of these voice checks for all the VC commands
 		const voiceChannel = interaction.member.voice.channel
 		if (!voiceChannel) return interaction.reply("Not in a channel")
 
 		await interaction.deferReply()
+		// * queues.create => finds or creates queue
+		let queue = player.queues.create(guild, { volume: 10 })
 
-		let queue
-		// const oldQueue = client.player.queues.get(guild)
-		const oldQueue = client.player.queues.get(guild)
-		if (!!oldQueue) {
-			console.log("oldQueue")
-			queue = oldQueue
-		} else {
-			console.log("newQueue")
-			// queue = await client.player.createQueue(guild)
-			queue = await client.player.queues.create(guild)
-		}
 		if (!queue.connection) await queue.connect(voiceChannel)
-		// if (!oldQueue) await queue.setVolume(30)
-		if (!oldQueue) {
-			queue.options.volume = 30
-		}
 
-		await client.player.extractors.register(YouTubeExtractor)
-		// TODO Search not returning tracks
-		const result = await client.player.search(searchTerm, {
+		const result = await player.search(searchTerm, {
 			requestedBy: interaction.user,
-			// searchEngine: QueryType.SOUNDCLOUD_SEARCH,
-			// searchEngine: `ext:${YouTubeExtractor.identifier}`,
 		})
-		// * can use this instead of passing down and destructuring player/client/etc
-		// const pl1 = await useMainPlayer()
-		console.log({ searchTerm, result })
-		// debugger
+
+		starMid(` Searching for: ${searchTerm}`)
+		starMid(`extractor: ${result.extractor.identifier}`)
+
 		let embed = new EmbedBuilder()
 
 		const track = result.tracks[0]
-		
+
 		if (result.hasTracks()) {
 			if (!!result.playlist) {
 				// if it's Playlist, then add all to queue
@@ -72,7 +56,7 @@ module.exports = {
 					// .setThumbnail(thumbnail)
 					.setFooter({ text: `Added ${tracks.length} tracks` })
 			} else {
-				console.log(track)
+				// console.log(track)
 				const { title, url, thumbnail, duration } = track
 				await queue.addTrack(track)
 				embed
@@ -80,16 +64,11 @@ module.exports = {
 					.setThumbnail(thumbnail)
 					.setFooter({ text: `Duration: ${duration}` })
 			}
-			// debugger
-			if (!queue.isPlaying()) await queue.play(track)
+			if (!queue.node.isPlaying()) await queue.node.play()
 			await interaction.editReply("🔻🔻🔻 Found some shit 🔻🔻🔻")
 			await interaction.channel.send({ embeds: [embed] })
 		} else {
 			await interaction.editReply("🔺🔺🔺 We ain't found shit 🔺🔺🔺")
 		}
-
-		// ? Delete it?
-		// await wait(5000)
-		// await interaction.deleteReply()
 	},
 }
