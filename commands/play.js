@@ -1,6 +1,5 @@
 const { EmbedBuilder, SlashCommandBuilder } = require("discord.js")
-const { QueryType } = require("discord-player")
-const wait = require("node:timers/promises").setTimeout
+const { starMid } = require("../debugHelpers.js")
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -13,62 +12,63 @@ module.exports = {
 		),
 
 	execute: async (interaction) => {
-		console.log("PLAYING")
-		const { client, guild } = interaction
+		starMid("PLAYING")
+		const {
+			client: { player },
+			guild,
+		} = interaction
 		const searchTerm = interaction.options.getString("search")
+
+		// TODO refactor all of these voice checks for all the VC commands
 		const voiceChannel = interaction.member.voice.channel
 		if (!voiceChannel) return interaction.reply("Not in a channel")
 
 		await interaction.deferReply()
+		// * queues.create => finds or creates queue
+		let queue = player.queues.create(guild, { volume: 10 })
 
-		let queue
-		const oldQueue = client.player.getQueue(guild)
-		if (!!oldQueue) {
-			console.log("oldQueue")
-			queue = oldQueue
-		} else {
-			console.log("newQueue")
-			queue = await client.player.createQueue(guild)
-		}
 		if (!queue.connection) await queue.connect(voiceChannel)
-		if (!oldQueue) await queue.setVolume(30)
-		const result = await client.player.search(searchTerm, {
+
+		const result = await player.search(searchTerm, {
 			requestedBy: interaction.user,
-			searchEngine: QueryType.AUTO,
 		})
 
-		console.log({ searchTerm, result })
+		starMid(` Searching for: ${searchTerm}`)
+		starMid(`extractor: ${result.extractor.identifier}`)
+
 		let embed = new EmbedBuilder()
 
-		if (!!result.playlist) {
-			// if it's Playlist, then add all to queue
-			const {
-				tracks,
-				playlist: { title, url, thumbnail },
-			} = result
-			await queue.addTracks(tracks)
-			embed
-				.setDescription(
-					`**[${title}](${url})** playlist has been added to the Queue`
-				)
-				// ? Why no work on playlist only??
-				// .setThumbnail(thumbnail)
-				.setFooter({ text: `Added ${tracks.length} tracks` })
-		} else {
-			const track = result.tracks[0]
-			const { title, url, thumbnail, duration } = track
-			await queue.addTrack(track)
-			embed
-				.setDescription(`**[${title}](${url})** has been added to the Queue`)
-				.setThumbnail(thumbnail)
-				.setFooter({ text: `Duration: ${duration}` })
-		}
+		const track = result.tracks[0]
 
-		if (!queue.playing) await queue.play()
-		await interaction.editReply("🔻🔻🔻 Found some shit 🔻🔻🔻")
-		await interaction.channel.send({ embeds: [embed] })
-		// ? Delete it?
-		// await wait(5000)
-		// await interaction.deleteReply()
+		if (result.hasTracks()) {
+			if (!!result.playlist) {
+				// if it's Playlist, then add all to queue
+				const {
+					tracks,
+					playlist: { title, url, thumbnail },
+				} = result
+				await queue.addTracks(tracks)
+				embed
+					.setDescription(
+						`**[${title}](${url})** playlist has been added to the Queue`
+					)
+					// ? Why no work on playlist only??
+					// .setThumbnail(thumbnail)
+					.setFooter({ text: `Added ${tracks.length} tracks` })
+			} else {
+				// console.log(track)
+				const { title, url, thumbnail, duration } = track
+				await queue.addTrack(track)
+				embed
+					.setDescription(`**[${title}](${url})** has been added to the Queue`)
+					.setThumbnail(thumbnail)
+					.setFooter({ text: `Duration: ${duration}` })
+			}
+			if (!queue.node.isPlaying()) await queue.node.play()
+			await interaction.editReply("🔻🔻🔻 Found some shit 🔻🔻🔻")
+			await interaction.channel.send({ embeds: [embed] })
+		} else {
+			await interaction.editReply("🔺🔺🔺 We ain't found shit 🔺🔺🔺")
+		}
 	},
 }

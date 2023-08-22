@@ -15,10 +15,10 @@ module.exports = {
 	execute: async (interaction) => {
 		const { client, guild } = interaction
 		const volume = interaction.options.getInteger("volume")
-		const queue = client.player.getQueue(guild.id)
+		const queue = client.player.queues.get(guild)
 		if (!queue) return await interaction.reply("Nothing in the queue")
 
-		queue.setVolume(volume)
+		queue.node.setVolume(volume)
 		await interaction.reply("Set Volume to: " + volume)
 	},
 }

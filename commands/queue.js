@@ -11,11 +11,11 @@ module.exports = {
 				.setMaxValue(50)
 				.setMinValue(0)
 		)
-		.setDescription("Shows the queue of songs"),
+		.setDescription("Shows the queue of songs (is not perfect yet..)"),
 
 	execute: async (interaction) => {
 		const { client, guild } = interaction
-		const queue = client.player.getQueue(guild)
+		const queue = client.player.queues.get(guild)
 		if (!queue) return await interaction.reply("Nothing in the queue!")
 
 		await interaction.deferReply()
@@ -23,7 +23,7 @@ module.exports = {
 		let mappedTracks = queue.tracks.map((t, i) => `${i + 1}:\t ${t.title}`)
 		let amount = interaction.options.getInteger("amount") || 50
 
-		const np = queue.nowPlaying()
+		const np = queue.currentTrack
 
 		// TODO error if nothing left in queue
 		if (queue.tracks.length > 0) {

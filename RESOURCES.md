@@ -11,9 +11,6 @@
 Discord 14 Updates
 - https://stackoverflow.com/questions/73028854/discord-js-v13-code-breaks-when-upgrading-to-v14
 
-## Deployed on Heroku
+## Deployed on DO Droplet
 
-### Heroku commands
 
-- heroku scale worker=<number>
-- heroku maintainence:(on/off)
