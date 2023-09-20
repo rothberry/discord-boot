@@ -12,34 +12,20 @@ module.exports = {
 		.setDescription(
 			"Seeks ahead 30 seconds, optional parameter of other amounts"
 		),
-	execute2: async (interaction) => {
-		await interaction.reply(
-			"https://images2.minutemediacdn.com/image/upload/c_fill,w_720,ar_16:9,f_auto,q_auto,g_auto/shape/cover/sport/construction-banner-5bfe1ad8296f53a90e679a494b794301.jpg"
-		)
-	},
-
 	execute: async (interaction) => {
 		const { client, guild } = interaction
 		let seconds = interaction.options.getInteger("seconds") || 30
 		const queue = client.player.queues.get(guild)
 		if (!queue) return await interaction.reply("Nothing in the queue!")
-		console.log("SEEKING")
-		console.log({ seconds })
+		const ts = queue.node.getTimestamp()
+		const { current, total } = ts
 
-		const ts = queue.getPlayerTimestamp()
-		const { current, end } = ts
-		const currentMS = convert(current)
-		const endMS = convert(end)
-
-		let newTime = currentMS + seconds * 1000
-		console.log({ ts, currentMS, endMS, newTime })
-		await queue.seek(newTime)
-
-		await interaction.reply(`Sooked ahead ${seconds} seconds`)
+		const newTime = current.value + seconds * 1000
+		if (newTime <= total.value) {
+			await queue.node.seek(newTime)
+			await interaction.reply(`Sooked ahead ${seconds} seconds`)
+		} else {
+			await interaction.reply(`There are not that many seconds here bruh`)
+		}
 	},
-}
-
-const convert = (minuteStr) => {
-	const splitNumber = minuteStr.split(":")
-	return Number(splitNumber[0]) * 60 * 1000 + Number(splitNumber[1]) * 1000
 }

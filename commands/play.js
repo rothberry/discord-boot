@@ -7,8 +7,11 @@ module.exports = {
 		.addStringOption((option) =>
 			option.setName("search").setRequired(true).setDescription("searchTerms")
 		)
+		.addBooleanOption((option) =>
+			option.setName("top").setRequired(false).setDescription("Add to top")
+		)
 		.setDescription(
-			"Can search youtube for first result, or can take a URL, may work for Spotfiy too?"
+			"Search yt or track/playlist URL from most music libraries (Spotify/Soundcloud/Youtube)"
 		),
 
 	execute: async (interaction) => {
@@ -18,6 +21,7 @@ module.exports = {
 			guild,
 		} = interaction
 		const searchTerm = interaction.options.getString("search")
+		const isFirst = interaction.options.getBoolean("top")
 
 		// TODO refactor all of these voice checks for all the VC commands
 		const voiceChannel = interaction.member.voice.channel
@@ -39,8 +43,8 @@ module.exports = {
 		let embed = new EmbedBuilder()
 
 		const track = result.tracks[0]
-		// debugger
 		if (result.hasTracks()) {
+			// TODO yt playlist stopped working?
 			if (!!result.playlist) {
 				// if it's Playlist, then add all to queue
 				const {
@@ -57,9 +61,10 @@ module.exports = {
 					.setFooter({ text: `Added ${tracks.length} tracks` })
 			} else {
 				// console.log(track)
-				debugger
 				const { title, url, thumbnail, duration } = track
-				await queue.addTrack(track)
+				isFirst
+					? await queue.insertTrack(track, 0)
+					: await queue.addTrack(track)
 				embed
 					.setDescription(`**[${title}](${url})** has been added to the Queue`)
 					.setThumbnail(thumbnail)
