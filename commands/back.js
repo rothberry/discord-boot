@@ -18,17 +18,9 @@ module.exports = {
 
 		await interaction.deferReply()
 
-		// let amount = interaction.options.getInteger("amount") || 1
-		// for (let i = 0; i < amount; i++) {
-		// }
-
-		const skippedTrack = queue.current
-		// // const backUp = queue.previousTracks[amount - 1] || queue.previousTracks[0]
-		await queue.back()
-
-		const backUp = await queue.nowPlaying()
-
-		console.log({ backUp, skippedTrack, queue })
+		const skippedTrack = queue.currentTrack
+		const backUp = queue.history.previousTrack
+		await queue.history.previous()
 
 		let embed = new EmbedBuilder()
 			.setTitle(`Now Playing: ${backUp.title}`)

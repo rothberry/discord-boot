@@ -39,7 +39,7 @@ module.exports = {
 		let embed = new EmbedBuilder()
 
 		const track = result.tracks[0]
-
+		// debugger
 		if (result.hasTracks()) {
 			if (!!result.playlist) {
 				// if it's Playlist, then add all to queue
@@ -47,7 +47,7 @@ module.exports = {
 					tracks,
 					playlist: { title, url, thumbnail },
 				} = result
-				await queue.addTracks(tracks)
+				await queue.addTrack(result.playlist)
 				embed
 					.setDescription(
 						`**[${title}](${url})** playlist has been added to the Queue`
@@ -57,6 +57,7 @@ module.exports = {
 					.setFooter({ text: `Added ${tracks.length} tracks` })
 			} else {
 				// console.log(track)
+				debugger
 				const { title, url, thumbnail, duration } = track
 				await queue.addTrack(track)
 				embed

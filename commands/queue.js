@@ -20,15 +20,15 @@ module.exports = {
 
 		await interaction.deferReply()
 
-		let mappedTracks = queue.tracks.map((t, i) => `${i + 1}:\t ${t.title}`)
+		let mappedTracks = queue.tracks.map(
+			(t, i) => `${i + 1}:\t ${t.author ? t.author + " - " : null}${t.title}`
+		)
 		let amount = interaction.options.getInteger("amount") || 50
 
 		const np = queue.currentTrack
-
-		// TODO error if nothing left in queue
-		if (queue.tracks.length > 0) {
+		if (queue.tracks.size > 0) {
 			let embed = new EmbedBuilder()
-				.setTitle(np.title)
+				.setTitle(`${np.author ? np.author + " - " : null}${np.title} `)
 				.setURL(np.url)
 				.setThumbnail(np.thumbnail)
 				.setDescription(mappedTracks.slice(0, amount).join("\n"))
@@ -37,7 +37,9 @@ module.exports = {
 			await interaction.channel.send({ embeds: [embed] })
 			await interaction.deleteReply()
 		} else {
-			await interaction.editReply("Oi bruv, there ain't nuttin' left in da queue..")
+			await interaction.editReply(
+				"Oi bruv, there ain't nuttin' left in da queue.."
+			)
 		}
 	},
 }

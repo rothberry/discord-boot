@@ -12,8 +12,7 @@ module.exports = {
 		await interaction.deferReply()
 
 		const song = queue.currentTrack
-		const { title, url, thumbnail } = song
-
+		const { title, url, thumbnail, author } = song
 		// TODO make progressbar fit all widths
 		let bar = queue.node.createProgressBar({
 			queue: true,
@@ -23,7 +22,9 @@ module.exports = {
 
 		let embed = new EmbedBuilder()
 			.setThumbnail(thumbnail)
-			.setDescription(`Currently Playing: [${title}](${url})\n\n` + bar)
+			.setDescription(
+				`Currently Playing: [${author ? author + " - " : null}${title}](${url})\n\n` + bar
+			)
 			.setFooter({ text: "Volume at " + queue.node.volume })
 			.setColor("Gold")
 
