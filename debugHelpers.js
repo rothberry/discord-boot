@@ -1,5 +1,5 @@
 const starLine = (char = "*") => {
-	const tWidth = process.stdout.columns
+	const tWidth = process.stdout.columns || 80
 	console.log(new Array(tWidth).fill(char).join(""))
 }
 
@@ -10,7 +10,7 @@ const starWrap = (log, char = "*") => {
 }
 
 const starMid = (text, char = "*") => {
-	const tWidth = process.stdout.columns
+	const tWidth = process.stdout.columns || 80
 	const halfSize = parseInt((tWidth - text.length - 2) / 2)
 	const halfStars = new Array(halfSize).fill(char).join("")
 	console.log(`${halfStars} ${text} ${halfStars}`)

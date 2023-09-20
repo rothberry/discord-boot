@@ -37,7 +37,7 @@ module.exports = {
 			requestedBy: interaction.user,
 		})
 
-		starMid(` Searching for: ${searchTerm}`)
+		// starMid(` Searching for: ${searchTerm}`)
 		starMid(`extractor: ${result.extractor.identifier}`)
 
 		let embed = new EmbedBuilder()
