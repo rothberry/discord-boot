@@ -61,23 +61,6 @@ const loadExtractors = async (player) => {
 	// starMid("Loaded Extractors")
 }
 
-// ? Found to stop the music from stopping around 55 seconds in, is apparently an issue with the new @discordjs/voice not the discord-player...
-client.player.events.on("connection", (queue) => {
-	queue.dispatcher.voiceConnection.on("stateChange", (oldState, newState) => {
-		starMid(`Hit VC State Change`)
-		const oldNetworking = Reflect.get(oldState, "networking")
-		const newNetworking = Reflect.get(newState, "networking")
-
-		const networkStateChangeHandler = (oldNetworkState, newNetworkState) => {
-			const newUdp = Reflect.get(newNetworkState, "udp")
-			clearInterval(newUdp?.keepAliveInterval)
-		}
-
-		oldNetworking?.off("stateChange", networkStateChangeHandler)
-		newNetworking?.on("stateChange", networkStateChangeHandler)
-	})
-})
-
 loadExtractors(client.player)
 
 client.on(Events.InteractionCreate, async (interaction) => {
